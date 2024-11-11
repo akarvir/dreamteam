@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>Login page</head>
+<body>
+    <form id="useraccountlogin" action= "http://localhost:8080/users/login" method="post" autocomplete="off">
+        <label for="username">Enter your username:</label>
+        <input type="text" id="username" name="username" autocomplete="username">
+        <br>
+        <label for="password">Enter your password:</label>
+        <input type="password" id="password" name="password" autocomplete="current-password">
+        <br>
+        <input type="submit" value="Login">
+    </form>
+    
+
+
+</body>
+</html>

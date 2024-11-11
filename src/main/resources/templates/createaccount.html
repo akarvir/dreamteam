@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>Create Account</head>
+    
+    
+    <body>
+
+        <div th:text =  "${accountstatus}">Create an account</div>
+
+        <form id="useraccountcreation" action= "http://localhost:8080/users/createdaccount" method="post" autocomplete="off"> 
+            <label for="username">new username:</label>
+            <input type="text" id="username" name="newusername">
+            <br>
+            <label for="password">new password:</label>
+            <input type="password" id="password" name="newpassword">
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+
+    
+
+
+
+
+
+    </body>
+
+
+
+
+
+
+</html>

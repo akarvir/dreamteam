@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xlmns:th = "http://www.thymeleaf.org">
+
+<body \>
+
+<h1>Create your Dream Team</h1>
+<div>Welcome,</div>
+<div th:text = "${user}">User</div>
+
+
+    <label for  = "nationalities">Choose nationality</label>
+    <select id = "nationalities" name = "nationalities" onchange = "generatetable()">
+    </select>
+
+
+    <div style = "display: flex; gap : 30px;">
+        <table  style="background-color: lightblue; flex-grow: 1;" border="1" id="myTable">
+            <thead> 
+                <tr>
+                    <th>Name</th>
+                    <th>Full-name</th>
+                    <th>Birthdate</th>
+                    <th>Age</th>
+                    <th>Height(cm)</th>
+                    <th>Positions</th>
+                    <th>Rating</th>
+                    <th>Potential</th>
+    
+                </tr>
+    
+            </thead>
+            <tbody id = "playertablebody">
+            </tbody>
+        </table>
+        <p>Your current team:</p>
+        <table style="background-color: rgb(230, 201, 173);" border="1" id="teamtable">
+            <thead> 
+                <tr>
+                    <th>Name</th>
+                    <th>Positions</th>
+                    <th>Rating</th> 
+                </tr>
+    
+            </thead>
+            <tbody id = "tablesbody">
+            </tbody>
+        </table>
+    
+    </div>
+    <style>
+          #teamtable {
+        max-height: 400px;  /* Set a fixed height */
+        overflow-y: auto;   /* Enable scrolling if content exceeds the height */
+    }
+       
+
+    </style>
+    
+
+
+<script th:inline="javascript">
+    window.onload = function() {
+
+        var jsUser = /*[[${user}]]*/ '';   
+
+        fetch(`http://localhost:8080/soccerplayer/renderingnationalities`)
+    .then(response => {
+        if (!response.ok) {
+            console.log("There was an error");
+        }
+        return response.json();
+    }).then((data)=>{
+
+        var dropdownlist = document.getElementById("nationalities");
+        for(var i = 0; i< data.length;i++) {
+            var option = document.createElement("option");
+            option.value = data[i];
+            option.text = data[i];
+            dropdownlist.add(option);
+
+
+
+        
+
+    
+
+        }
+    }).catch(error => {
+            console.log(error);
+    });
+
+
+   
+     
+
+    fetch(`http://localhost:8080/users/personalteam`, {
+    method: "POST",
+    headers: { 
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({username: jsUser}),
+}).then((response=>response.json())).then((data)=>{
+
+
+    const table = document.getElementById("teamtable");
+    
+    const tablebody = document.getElementById("tablesbody");
+
+    
+
+    for(var i = 0; i<data.length; i++) {
+
+        const row = document.createElement("tr");
+
+        for(let key in data[i]) {
+
+            if(key=="name" || key=="positions" || key=="overallRating") {
+
+                const tablecell = document.createElement("td");
+                const celltext = document.createTextNode(data[i][key]); 
+                tablecell.append(celltext);
+                row.appendChild(tablecell);
+            }
+        }
+
+        const button = document.createElement("button");
+        button.textContent = '-';
+
+        button.addEventListener('click',()=>{
+            
+            const buttonsrow = button.closest("tr");
+            const player_name = buttonsrow.cells[0].textContent; 
+            buttonsrow.parentNode.removeChild(row);
+            
+            fetch(`http://localhost:8080/users/removeplayer`, {
+    method: "POST",
+    headers: { 
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({username: jsUser,playername : player_name}),
+}).then(()=>console.log("yahoo")).catch((error)=> console.log(error))
+
+        })
+
+        const cell = document.createElement("td");
+        cell.append(button);
+        row.appendChild(cell);
+        tablebody.append(row);
+
+
+
+    }
+
+
+
+
+     
+
+})
+
+
+
+    };
+
+
+
+
+
+    function generatetable() {
+
+        
+        
+        fetch(`http://localhost:8080/soccerplayer/selectednationality`, {
+    method: "POST",
+    headers: { 
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({country: document.getElementById("nationalities").value}),
+}).then((response)=> {
+    return response.json()
+}
+       ).then((data)=> {
+
+            
+            
+            const table = document.getElementById("myTable");
+            const tablebody = document.createElement("tbody");
+
+
+            for(var i = 0; i<data.length; i++) {
+
+                const row = document.createElement("tr");
+
+                for(let key in data[i]) {
+                    if(key!="weightkgs" && key!="id" && key!="nationality" && key!="user") {
+                        const tablecell = document.createElement("td");
+                         const celltext = document.createTextNode(data[i][key]);
+                        tablecell.append(celltext);
+                         row.appendChild(tablecell);
+                    }
+                }
+
+                const button = document.createElement('button');
+                button.textContent = '+'
+                button.addEventListener('click',()=>{
+
+                    var jsUser = /*[[${user}]]*/ '';   
+
+                     const nearestrow = button.closest("tr");
+                     const player_name = nearestrow.cells[0].textContent; 
+                     const player_position = nearestrow.cells[5].textContent; 
+                     const playerr_rating = nearestrow.cells[6].textContent; 
+
+                     
+                     const teamtable = document.getElementById("teamtable"); 
+                     var tbody = document.getElementById("tablesbody");
+                     const new_row = document.createElement("tr");
+
+                     const cell1 = document.createElement("td");
+                     const cell2 = document.createElement("td");
+                     const cell3 = document.createElement("td");
+                     cell1.append(document.createTextNode(player_name));
+                     cell2.append(document.createTextNode(player_position));
+                     cell3.append(document.createTextNode(playerr_rating));
+                     new_row.appendChild(cell1);
+                     new_row.appendChild (cell2);
+                     new_row.appendChild(cell3); 
+                      
+                    
+                    fetch(`http://localhost:8080/users/addplayer`, {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json"
+                            },
+                        
+                    
+                        body: JSON.stringify({username:jsUser, playername: player_name}),
+                        }).then(()=>console.log("yahoo")).catch((error)=>console.log(error))
+
+                        const button3 = document.createElement("button");
+                         button3.textContent = '-';
+
+                         button3.addEventListener('click',()=>{
+            
+                                const buttonsrow = button3.closest("tr");
+                                const player_name = buttonsrow.cells[0].textContent; 
+                                 buttonsrow.remove();
+            
+                             fetch(`http://localhost:8080/users/removeplayer`, {
+                             method: "POST",
+                             headers: { 
+                                  "Content-Type": "application/json"
+                                      },
+                                body: JSON.stringify({username: jsUser,playername : player_name}),
+                                    }).then(()=>console.log("yahoo")).catch((error)=> console.log(error))
+
+                             })
+
+                        const tablecell4 = document.createElement("td");
+                        tablecell4.append(button3);
+                        new_row.appendChild(tablecell4);
+                        tbody.append(new_row);
+                     
+
+
+                     
+
+
+                });
+                const cell = document.createElement("td");
+                cell.append(button);
+                row.appendChild(cell);
+                tablebody.append(row);
+
+
+            }
+
+            oldtablebody = table.getElementsByTagName("tbody")[0];
+            table.replaceChild(tablebody,oldtablebody);
+             
+             
+
+
+
+            
+
+
+       }).catch((error)=> console.log(error))
+     
+
+    }
+    
+
+        // a trial to see if the post request is going through. 
+      
+</script>
+
+</body>
+</html>
