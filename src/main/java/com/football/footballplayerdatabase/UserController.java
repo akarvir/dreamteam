@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserController {
 
     @Autowired
-    private UserService userservice; 
+    private UserService userservice; // gotta have two different @Autowired annotations for both service instances. 
     @Autowired
     private SoccerplayerService playerservice; 
 
@@ -51,9 +51,9 @@ public class UserController {
        
        
        user.getTeam().add(player);
-       userservice.update(user);
+       userservice.update(user); // have to commit the changes. 
        User user2 = userservice.finduserbyusername(username);
-       for(Soccerplayer teamplayer: user2.getTeam()) {System.out.println("The newest player to have been added is " + teamplayer.getName());}
+      
       
        
        return ResponseEntity.status(HttpStatus.OK).build();
