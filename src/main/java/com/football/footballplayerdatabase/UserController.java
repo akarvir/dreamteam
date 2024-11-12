@@ -56,7 +56,6 @@ public class UserController {
        for(Soccerplayer teamplayer: user2.getTeam()) {System.out.println("The newest player to have been added is " + teamplayer.getName());}
       
        
-       System.out.println();
        return ResponseEntity.status(HttpStatus.OK).build();
 
 
@@ -92,7 +91,7 @@ public class UserController {
         JSONObject object = new JSONObject(input);
         String username = object.getString("username");
         User user = userservice.finduserbyusername(username);
-        System.out.println(username);
+      
         
         for (Soccerplayer player:user.getTeam()) System.out.println(player.getName());
         return new ResponseEntity<List<Soccerplayer>>(user.getTeam(),HttpStatus.OK);
@@ -114,20 +113,15 @@ public class UserController {
     @PostMapping("/removeplayer")
     public ResponseEntity<Void> removingplayer(@RequestBody String input) {
 
-        System.out.println("The request is getting here");
+       
         JSONObject object = new JSONObject(input);
         String playername = object.getString("playername"); 
         String username = object.getString("username");
         User user = userservice.finduserbyusername(username);
-        System.out.println("About to enter the loop");
-        System.out.println("The length of the team is " + user.getTeam().size());
         for(Soccerplayer player: user.getTeam()) {
-            System.out.println("In the loop");
-            System.out.println("The team player name" + player.getName() + " the desired player name " + playername);
             if(player.getName().equals(playername)) {
                 user.getTeam().remove(player);
                 userservice.update(user);
-                System.out.println("I have removed the player from the team");
                 return ResponseEntity.status(HttpStatus.OK).build(); 
             }
         }
